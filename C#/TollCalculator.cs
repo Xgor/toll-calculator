@@ -86,25 +86,22 @@ namespace TollFeeCalculator
 
         private Boolean IsTollFreeDate(DateTime date)
         {
+            if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) return true;
             int year = date.Year;
             int month = date.Month;
             int day = date.Day;
 
-            if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) return true;
+            var easterSunday = EasterSunday(year);
 
-            if (year == 2013) // Detta behöver modiferas för att kunna hantera högtider. Specifikt Midsommar, Kristi himmelsfärd och Påsk behöver jag kolla in.
+            if (month == 1 && (day == 1 || day == 6) || // New years eve and epiphany Eve
+                month == 5 && (day == 1) || // First of may
+                month == 6 && (day == 6) || // Swedish national day
+                month == 12 && (day == 25 || day == 26) || // Christmas day and Boxing day
+                easterSunday.AddDays(-2).Day == date.Day || // Good Friday
+                easterSunday.AddDays(1).Day == date.Day || // Easter Monday
+                easterSunday.AddDays(39).Day == date.Day) // Ascension Day
             {
-                if (month == 1 && (day == 1 || day == 6) || // La till Trettondag
-                    month == 3 && (day == 28 || day == 29) || // Modifera för påsk med DateUtils.EasterSunday
-                    month == 4 && (day == 1 || day == 30) || // Första april är inte högtid... inte heller valborg
-                    month == 5 && (day == 1 || day == 8 || day == 9) ||
-                    month == 6 && (day == 5 || day == 6 || day == 21) || // 5 juni högtid?
-                    month == 7 || // Är hela juli en högtid?
-                    month == 11 && day == 1 || // Behövs Alla helgons dag hanteras? Är på en lördag
-                    month == 12 && (day == 24 || day == 25 || day == 26 || day == 31)) // Räknas julafton och nyårsdagen?
-                {
-                    return true;
-                }
+                return true;
             }
             return false;
         }
@@ -119,63 +116,32 @@ namespace TollFeeCalculator
             Military = 5
         }
 
-
-        static void Main(string[] args)
+        // From
+        // https://web.archive.org/web/20120223154950/https://aa.usno.navy.mil/faq/docs/easter.php
+        // https://codereview.stackexchange.com/questions/193847/find-easter-on-any-given-year
+        // Gauss Easter algorithm
+        public static DateTime EasterSunday(int year)
         {
-            // Display the number of command line arguments.
-            Console.WriteLine(args.Length);
+            int day = 0;
+            int month = 0;
+
+            int g = year % 19;
+            int c = year / 100;
+            int h = (c - (int)(c / 4) - (int)((8 * c + 13) / 25) + 19 * g + 15) % 30;
+            int i = h - (int)(h / 28) * (1 - (int)(h / 28) * (int)(29 / (h + 1)) * (int)((21 - g) / 11));
+
+            day = i - ((year + (int)(year / 4) + i + 2 - c + (int)(c / 4)) % 7) + 28;
+            month = 3;
+
+            if (day > 31)
+            {
+                month++;
+                day -= 31;
+            }
+
+            return new DateTime(year, month, day);
         }
+
     }
 }
 
-/*
-public class TollTester
-{
-    public void runUnitTest()
-    {
-        TollCalculator toll = new TollCalculator();
-        Car testCar = new Car();
-        DateTime[] testChristmas = new DateTime[new DateTime(2013, 12, 25, 10, 30, 50),new DateTime(2013, 12, 25, 10, 50, 50)]
-        if 0 ==toll.GetTollFee(testCar,testChristmas):
-            Console.Write("testChristmas SUCCESS");
-        else:
-            Console.Write("testChristmas FAIL");
-        DateTime[] testNormal = new DateTime[new DateTime(2013, 12, 22, 10, 30, 50),new DateTime(2013, 12, 22, 10, 50, 50)]
-        
-        if 0 ==toll.GetTollFee(testCar,testNormal):
-            Console.Write("testChristmas SUCCESS");
-        else:
-            Console.Write("testChristmas FAIL");
-    }
-}
-*/
-
-
-// Från
-// https://web.archive.org/web/20120223154950/https://aa.usno.navy.mil/faq/docs/easter.php
-//  https://codereview.stackexchange.com/questions/193847/find-easter-on-any-given-year
-// Gauss Easter algorithm
-
-/*
-public static DateTime EasterSunday(int year)
-{
-    int day = 0;
-    int month = 0;
-
-    int g = year % 19;
-    int c = year / 100;
-    int h = (c - (int)(c / 4) - (int)((8 * c + 13) / 25) + 19 * g + 15) % 30;
-    int i = h - (int)(h / 28) * (1 - (int)(h / 28) * (int)(29 / (h + 1)) * (int)((21 - g) / 11));
-
-    day   = i - ((year + (int)(year / 4) + i + 2 - c + (int)(c / 4)) % 7) + 28;
-    month = 3;
-
-    if (day > 31)
-    {
-        month++;
-        day -= 31;
-    }
-
-    return new DateTime(year, month, day);
-}
-*/
