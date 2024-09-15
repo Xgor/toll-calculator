@@ -2,11 +2,11 @@
 
 namespace TollFeeCalculator
 {
-    public class Motorbike : Vehicle
+    public class Military : Vehicle
     {
         public string GetVehicleType()
         {
-            return "Motorbike";
+            return "Military";
         }
     }
 }

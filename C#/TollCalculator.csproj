@@ -38,8 +38,13 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="Car.cs" />
+    <Compile Include="Diplomat.cs" />
+    <Compile Include="Emergency.cs" />
+    <Compile Include="Foreign.cs" />
+    <Compile Include="Military.cs" />
     <Compile Include="Motorbike.cs" />
     <Compile Include="TollCalculator.cs" />
+    <Compile Include="Tractor.cs" />
     <Compile Include="Vehicle.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

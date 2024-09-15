@@ -15,8 +15,15 @@ namespace TollFeeCalculator.Tests
     public class TollCalculatorTests
     {
         private readonly TollCalculator _tollCalculator;
+
         private readonly Vehicle car;
         private readonly Vehicle motorbike;
+        private readonly Vehicle tractor;
+        private readonly Vehicle military;
+        private readonly Vehicle diplomat;
+        private readonly Vehicle emergency;
+        private readonly Vehicle foreign;
+        
         private readonly DateTime[] emptyDateTimes;
         private readonly DateTime[] rushHourDayTimes;
         private readonly DateTime[] shuffledRushHourDayTimes;
@@ -32,6 +39,12 @@ namespace TollFeeCalculator.Tests
             _tollCalculator = new TollCalculator();
             car = new Car();
             motorbike = new Motorbike();
+            tractor = new Tractor();
+            military = new Military();
+            diplomat = new Diplomat();
+            emergency = new Emergency();
+            foreign = new Foreign();
+
             emptyDateTimes = Array.Empty<DateTime>();
             rushHourDayTimes = new DateTime[] { 
                 new DateTime(2024, 09, 16, 07, 00, 00),
@@ -225,42 +238,37 @@ namespace TollFeeCalculator.Tests
         [TestMethod()]
         public void TollFeesTractorTest()
         {
-            //int value = _tollCalculator.GetTollFee(motorbike, rushHourDayTimes);
+            int value = _tollCalculator.GetTollFee(tractor, rushHourDayTimes);
 
-            //    Assert.AreEqual(0, value);
-            Assert.Fail();
+            Assert.AreEqual(0, value);
         }
         [TestMethod()]
         public void TollFeesEmergencyTest()
         {
-            //int value = _tollCalculator.GetTollFee(motorbike, rushHourDayTimes);
+            int value = _tollCalculator.GetTollFee(emergency, rushHourDayTimes);
 
-            //    Assert.AreEqual(0, value);
-            Assert.Fail();
+            Assert.AreEqual(0, value);
         }
         [TestMethod()]
         public void TollFeesDiplomatTest()
         {
-            //int value = _tollCalculator.GetTollFee(motorbike, rushHourDayTimes);
+            int value = _tollCalculator.GetTollFee(diplomat, rushHourDayTimes);
 
-            //    Assert.AreEqual(0, value);
-            Assert.Fail();
+            Assert.AreEqual(0, value);
         }
         [TestMethod()]
         public void TollFeesForeignTest()
         {
-            //int value = _tollCalculator.GetTollFee(motorbike, rushHourDayTimes);
+            int value = _tollCalculator.GetTollFee(foreign, rushHourDayTimes);
 
-            //    Assert.AreEqual(0, value);
-            Assert.Fail();
+            Assert.AreEqual(0, value);
         }
         [TestMethod()]
         public void TollFeesMilitaryTest()
         {
-            //int value = _tollCalculator.GetTollFee(motorbike, rushHourDayTimes);
+            int value = _tollCalculator.GetTollFee(military, rushHourDayTimes);
 
-            //    Assert.AreEqual(0, value);
-            Assert.Fail();
+            Assert.AreEqual(0, value);
         }
     }
 }
