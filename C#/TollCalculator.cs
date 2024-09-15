@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using TollFeeCalculator;
 
 namespace TollFeeCalculator
@@ -20,34 +22,49 @@ namespace TollFeeCalculator
             // Return zero if array is empty
             if (dates == null || dates.Length == 0) return 0;
 
-            //
-
-            // Om jag ska behålla intervalStart så behövs sortera dates i tidsordning. Man hoppas det är i tidsordning men man vet aldrig
-            DateTime intervalStart = dates[0];
-            int totalFee = 0;
-            foreach (DateTime date in dates)
+            Array.Sort(dates);
+            var dateLists = new List<DateTime[]>();
+            List<DateTime> d = new List<DateTime>();
+            foreach(DateTime date in dates)
             {
-                int nextFee = GetTollFee(date, vehicle);
-                int tempFee = GetTollFee(intervalStart, vehicle); // Funderar man kan ha denna utanför loopen så man inte behöver hämta fees två gånger per loop
-
-                long diffInMillies = date.Millisecond - intervalStart.Millisecond;
-                long minutes = diffInMillies / 1000 / 60; // Varför inte bara göra date.minutes ?
-
-                // Denna kodsnutten är mest förvirrande och tror inte den ens funkar. 
-                // Tror den är för att kolla så det inte blir för flera gånger men den kollar bara mot ett datum och kollar om det är större inte mindre
-                // Tror idéen är att uppdatera interval start så kollar med den närmaste men det händer inte just nu.
-                if (minutes <= 60)
+                if (d.Count > 0 && d.FirstOrDefault().Date != date.Date)
                 {
-                    if (totalFee > 0) totalFee -= tempFee;
-                    if (nextFee >= tempFee) tempFee = nextFee;
-                    totalFee += tempFee;
+                    dateLists.Add(d.ToArray());
+                    d = new List<DateTime>();
                 }
-                else
-                {
-                    totalFee += nextFee;
-                }
+                d.Add(date);
             }
-            if (totalFee > 60) totalFee = 60; // Felplacerad. Detta gör så att det bara går att max få 60 kr på fakturan Behövs nog en loop för varje dag.
+            dateLists.Add(d.ToArray());
+
+            DateTime intervalStart = DateTime.MinValue;
+            int intervallFee = 0;
+            int totalFee = 0;
+            foreach (DateTime[] dateList in dateLists)
+            {
+                int dailyFee = 0;
+                foreach (DateTime date in dateList)
+                {
+                    int nextFee = GetTollFee(date, vehicle);
+
+                    double minutes = 999;
+                    if (intervalStart != DateTime.MinValue)
+                        minutes = date.TimeOfDay.TotalMinutes - intervalStart.TimeOfDay.TotalMinutes;
+
+                    if (date.Date == intervalStart.Date && minutes <= 60 && nextFee >= intervallFee)
+                    {
+                        dailyFee += nextFee - intervallFee;
+                        intervallFee = nextFee;
+                    }
+                    else
+                    {
+                        dailyFee += nextFee;
+                        intervallFee = nextFee;
+                        intervalStart = date;
+                    }
+                }
+                if (dailyFee > 60) dailyFee = 60; 
+                totalFee += dailyFee;
+            }
             return totalFee;
         }
 
@@ -73,33 +90,39 @@ namespace TollFeeCalculator
 
             // Känns som man skulle kunna göra denna lite mer läsbar. Finn definift delar som inte behövs
             if (hour == 6 && minute >= 0 && minute <= 29) return 8;
-            else if (hour == 6 && minute >= 30 && minute <= 59) return 13;
-            else if (hour == 7 && minute >= 0 && minute <= 59) return 18;
-            else if (hour == 8 && minute >= 0 && minute <= 29) return 13;
-            else if (hour >= 8 && hour <= 14 && minute >= 30 && minute <= 59) return 8;
-            else if (hour == 15 && minute >= 0 && minute <= 29) return 13;
-            else if (hour == 15 && minute >= 0 || hour == 16 && minute <= 59) return 18;
-            else if (hour == 17 && minute >= 0 && minute <= 59) return 13;
-            else if (hour == 18 && minute >= 0 && minute <= 29) return 8;
+            else if (hour == 6 && minute >= 30) return 13;
+            else if (hour == 7) return 18;
+            else if (hour == 8 && minute <= 29) return 13;
+            else if (hour <= 14) return 8;
+            else if (hour == 15 && minute <= 29) return 13;
+            else if (hour <= 16 ) return 18;
+            else if (hour == 17) return 13;
+            else if (hour == 18 && minute <= 29) return 8;
             else return 0;
         }
 
         private Boolean IsTollFreeDate(DateTime date)
         {
             if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) return true;
+
+            date = date.Date;
             int year = date.Year;
             int month = date.Month;
             int day = date.Day;
 
             var easterSunday = EasterSunday(year);
+            var midsummerEve = GetMidsummerEve(year);
+
+            // Unsure if Christmas eve and midsummer eve should be counted here but impemented them
 
             if (month == 1 && (day == 1 || day == 6) || // New years eve and epiphany Eve
                 month == 5 && (day == 1) || // First of may
                 month == 6 && (day == 6) || // Swedish national day
-                month == 12 && (day == 25 || day == 26) || // Christmas day and Boxing day
-                easterSunday.AddDays(-2).Day == date.Day || // Good Friday
-                easterSunday.AddDays(1).Day == date.Day || // Easter Monday
-                easterSunday.AddDays(39).Day == date.Day) // Ascension Day
+                month == 12 && (day == 24 || day == 25 || day == 26) || // Christmas 
+                easterSunday.AddDays(-2) == date || // Good Friday
+                easterSunday.AddDays(1) == date || // Easter Monday
+                easterSunday.AddDays(39) == date || // Ascension Day
+                midsummerEve == date) // midsummer
             {
                 return true;
             }
@@ -140,6 +163,13 @@ namespace TollFeeCalculator
             }
 
             return new DateTime(year, month, day);
+        }
+        
+        public DateTime GetMidsummerEve(int year)
+        {
+            DateTime d = new DateTime(year, 6, 19);
+            while(d.DayOfWeek != DayOfWeek.Friday) d = d.AddDays(1);
+            return d;
         }
 
     }

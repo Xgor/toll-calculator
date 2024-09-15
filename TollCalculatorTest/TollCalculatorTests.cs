@@ -99,6 +99,7 @@ namespace TollFeeCalculator.Tests
                 new DateTime(2024, 05, 01, 16, 30, 00),
                 new DateTime(2024, 05, 09, 16, 30, 00),
                 new DateTime(2024, 06, 06, 16, 30, 00),
+                new DateTime(2024, 06, 21, 16, 30, 00),
                 new DateTime(2024, 12, 25, 16, 30, 00),
                 new DateTime(2024, 12, 26, 16, 30, 00),
             };
@@ -111,6 +112,7 @@ namespace TollFeeCalculator.Tests
                 new DateTime(2025, 05, 01, 16, 30, 00),
                 new DateTime(2025, 05, 29, 16, 30, 00),
                 new DateTime(2025, 06, 06, 16, 30, 00),
+                new DateTime(2025, 06, 20, 16, 30, 00),
                 new DateTime(2025, 12, 25, 16, 30, 00),
                 new DateTime(2025, 12, 26, 16, 30, 00),
             };
@@ -201,7 +203,7 @@ namespace TollFeeCalculator.Tests
         {
             int value = _tollCalculator.GetTollFee(car, multiOneHourTimes);
 
-            Assert.AreEqual(0, value);
+            Assert.AreEqual(13, value);
         }
         
 
@@ -210,7 +212,7 @@ namespace TollFeeCalculator.Tests
         {
             int value = _tollCalculator.GetTollFee(car, reverseMultiOneHourTimes);
 
-            Assert.AreEqual(0, value);
+            Assert.AreEqual(13, value);
         }
         [TestMethod()]
         public void TollFeesMotorbikeTest()
