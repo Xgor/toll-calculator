@@ -1,8 +1,0 @@
-D:\MyProjects\toll-calculator\C#\obj\Debug\TollCalculator.csproj.AssemblyReference.cache
-D:\MyProjects\toll-calculator\C#\obj\Debug\TollCalculator.csproj.SuggestedBindingRedirects.cache
-D:\MyProjects\toll-calculator\C#\obj\Debug\TollCalculator.csproj.CoreCompileInputs.cache
-D:\MyProjects\toll-calculator\C#\bin\Debug\TollCalculator.exe.config
-D:\MyProjects\toll-calculator\C#\bin\Debug\TollCalculator.exe
-D:\MyProjects\toll-calculator\C#\bin\Debug\TollCalculator.pdb
-D:\MyProjects\toll-calculator\C#\obj\Debug\TollCalculator.exe
-D:\MyProjects\toll-calculator\C#\obj\Debug\TollCalculator.pdb
