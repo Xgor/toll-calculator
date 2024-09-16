@@ -67,7 +67,7 @@ namespace TollFeeCalculator
             return totalFee;
         }
 
-        private bool IsTollFreeVehicle(Vehicle vehicle) // TODO: Skapa Tractor, Emergency,Diplomat ,Foreign,Military
+        private bool IsTollFreeVehicle(Vehicle vehicle) 
         {
             if (vehicle == null) return false;
             String vehicleType = vehicle.GetVehicleType();
@@ -77,7 +77,6 @@ namespace TollFeeCalculator
                    vehicleType.Equals(TollFreeVehicles.Diplomat.ToString()) ||
                    vehicleType.Equals(TollFreeVehicles.Foreign.ToString()) ||
                    vehicleType.Equals(TollFreeVehicles.Military.ToString());
-            // Denna return är super ful, kan göra den mer elegant Kommer inte fungera nog för den checkar string med int
         }
 
         public int GetTollFee(DateTime date, Vehicle vehicle)
@@ -87,7 +86,6 @@ namespace TollFeeCalculator
             int hour = date.Hour;
             int minute = date.Minute;
 
-            // Känns som man skulle kunna göra denna lite mer läsbar. Finn definift delar som inte behövs
             if (hour == 6 && minute >= 0 && minute <= 29) return 8;
             else if (hour == 6 && minute >= 30) return 13;
             else if (hour == 7) return 18;
